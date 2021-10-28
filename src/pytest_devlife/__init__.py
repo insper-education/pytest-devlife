@@ -28,9 +28,7 @@ inpt = builtins.input
 @pytest.fixture
 def mock_input(monkeypatch):
     def mocked(prompt=''):
-        retval = inpt(prompt)
-        print(retval)
-        return retval
+        return inpt()
 
     def setup_mock(strings):
         monkeypatch.setattr('sys.stdin', io.StringIO('\n'.join(strings)))
