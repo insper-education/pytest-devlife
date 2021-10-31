@@ -8,6 +8,7 @@ import yaml
 import requests
 import traceback
 from pathlib import Path
+import sys
 
 
 SECTION_NAME = 'Developer Life'
@@ -189,6 +190,8 @@ class DevLifePyTestPlugin:
         syntax_error_mark = pytest.mark.skip(reason='A syntax error was found')
         for item in items:
             exercise = self.get_or_create_exercise_result(item)
+            if not exercise: 
+                continue
             exercise.inc_tests()
             if exercise.has_syntax_errors():
                 exercise.outcomes.increment('errors')
@@ -202,7 +205,8 @@ class DevLifePyTestPlugin:
 
         if rep.when == 'call':
             exercise = self.get_or_create_exercise_result(item)
-            exercise.outcomes.increment(rep.outcome)
+            if exercise:
+                exercise.outcomes.increment(rep.outcome)
 
     def pytest_sessionfinish(self):
         if not self.settings:
@@ -217,4 +221,5 @@ class DevLifePyTestPlugin:
 
 
 def pytest_configure(config):
+    sys.path.append(os.getcwd())
     config.pluginmanager.register(DevLifePyTestPlugin())
