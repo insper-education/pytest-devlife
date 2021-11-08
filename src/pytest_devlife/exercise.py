@@ -19,12 +19,10 @@ class Outcomes:
 class Exercise:
     def __init__(self, item):
         exercise_dir = Path(item.fspath).parent
-        self.meta_file = exercise_dir / 'meta.yml'
-        self.code_file = exercise_dir / 'solution.py'
         self.total_tests = 0
         self.outcomes = Outcomes()
 
-        self.meta = self._load_meta()
+        self.meta = self._load_meta(exercise_dir)
         self.code = self._load_code()
 
         self._check_meta()
@@ -69,13 +67,26 @@ class Exercise:
             self.error_msg = msg  # TODO DO WE NEED THIS MESSAGE FOR ANYTHING?
             self.syntax_ok = False
 
-    def _load_meta(self):
-        try:
-            with open(self.meta_file) as f:
-                return yaml.safe_load(f)
-        except IOError:
-            raise RuntimeError('Could not find meta.yml in exercise folder')
+    def _load_meta(self, exercise_dir):
+        prev_dir = None
+        curr_dir = exercise_dir
+        
+        while curr_dir and curr_dir != prev_dir: 
+            meta_file = curr_dir / 'meta.yml'
+            try:
+                with open(meta_file) as f:
+                    self.meta_file = meta_file
+                    return yaml.safe_load(f)
+            except IOError:
+                prev_dir = curr_dir
+                curr_dir = curr_dir.parent
+        raise RuntimeError('Could not find meta.yml in exercise folder')
 
     def _load_code(self):
+        try:
+            student_file = self.meta['studentFile']
+        except KeyError:
+            raise RuntimeError('Could not find studentFile in meta.yml')
+        self.code_file = self.meta_file.parent / student_file
         with open(self.code_file) as f:
             return f.read()
