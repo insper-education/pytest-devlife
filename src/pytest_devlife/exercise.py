@@ -34,8 +34,8 @@ class Exercise:
         return {
             'slug': self.slug,
             'points': passed / total,
-            'summary': {'passed': f'{passed}/{total}'},
-            'long_answer': {'code': self.code},
+            'test_results': {'passed': f'{passed}/{total}'},
+            'student_input': {'code': self.code},
         }
 
     def inc_tests(self):
@@ -70,8 +70,8 @@ class Exercise:
     def _load_meta(self, exercise_dir):
         prev_dir = None
         curr_dir = exercise_dir
-        
-        while curr_dir and curr_dir != prev_dir: 
+
+        while curr_dir and curr_dir != prev_dir:
             meta_file = curr_dir / 'meta.yml'
             try:
                 with open(meta_file) as f:
