@@ -13,14 +13,10 @@ from pytest_devlife.constants import SECTION_NAME, BLUE, FAIL, ENDC
 
 
 class DevLifePyTestPlugin:
-    def __init__(self):
+    def __init__(self, settings):
         self.exercise_results = {}
         self.messages = []
-        try:
-            self.settings = load_settings()
-        except (RuntimeError, FileNotFoundError) as e:
-            self.settings = None
-            self.messages.append(f'{FAIL}{e}{ENDC}')
+        self.settings = settings
 
     def submit_solution(self, exercise):
         title = exercise.meta.get("title")
@@ -86,4 +82,8 @@ class DevLifePyTestPlugin:
 
 def pytest_configure(config):
     sys.path.append(os.getcwd())
-    config.pluginmanager.register(DevLifePyTestPlugin())
+    try:
+        settings = load_settings()
+        config.pluginmanager.register(DevLifePyTestPlugin(settings))
+    except RuntimeError:
+        pass
