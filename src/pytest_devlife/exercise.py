@@ -60,6 +60,9 @@ class Exercise:
 
     def _check_code(self):
         self.syntax_ok = True
+        # We only check the syntax if the student file is a Python file
+        if '.py' not in Path(self.code_file).suffix:
+            return
         try:
             compile(self.code, filename=self.code_file, mode='exec', flags=ast.PyCF_ONLY_AST)
         except SyntaxError:
