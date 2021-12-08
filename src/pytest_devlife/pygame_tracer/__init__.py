@@ -31,7 +31,6 @@ class MockWrapper:
     def __init__(self, original_module):
         self.original_module = original_module
         self.methods_called = []
-        print(self, original_module)
 
     def __getattr__(self, name):
         if self.original_module:
