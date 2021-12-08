@@ -2,6 +2,7 @@ import builtins
 import io
 import pytest
 import runpy
+import pytest_devlife.pygame_tracer
 
 
 inpt = builtins.input
@@ -26,3 +27,8 @@ def run_program(capsys):
             stdout, _ = capsys.readouterr()
             pytest.fail(f'Your program called input() more times than expected. The program should have already ended. The output was:\n{stdout}')
     return runner
+
+
+@pytest.fixture
+def mockgame():
+    return pytest_devlife.pygame_tracer.mock
