@@ -1,8 +1,6 @@
 from types import BuiltinFunctionType, FunctionType
 from typing import Any
 import sys
-import pygame
-
 
 class MockFunction:
     def __init__(self, mod, name, callable):
@@ -58,11 +56,16 @@ def reset_state():
     mock.display.methods_called = []
 
 
-mock = MockWrapper(pygame)
-mock.display = MockWrapper(pygame.display)
-mock.image = MockWrapper(pygame.image)
-mock.event = MockWrapper(pygame.event)
+try:
+    import pygame
 
-should_call_pygame = True
-sys.modules['pygame'] = mock
-reset_state()
+    mock = MockWrapper(pygame)
+    mock.display = MockWrapper(pygame.display)
+    mock.image = MockWrapper(pygame.image)
+    mock.event = MockWrapper(pygame.event)
+
+    should_call_pygame = True
+    sys.modules['pygame'] = mock
+    reset_state()
+except ModuleNotFoundError:
+    pass
