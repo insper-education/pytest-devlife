@@ -31,4 +31,8 @@ def run_program(capsys):
 
 @pytest.fixture
 def mockgame():
-    return pytest_devlife.pygame_tracer.mock
+    import pytest_devlife.pygame_tracer
+    if hasattr(pytest_devlife.pygame_tracer, 'mock'):
+        return pytest_devlife.pygame_tracer.mock
+
+    pytest.fail('Pygame is not installed.')
