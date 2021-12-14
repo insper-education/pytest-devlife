@@ -22,7 +22,7 @@ def mock_input(monkeypatch):
 def run_program(capsys):
     def runner(filename):
         try:
-            runpy.run_path(filename)
+            return runpy.run_path(filename)
         except EOFError:
             stdout, _ = capsys.readouterr()
             pytest.fail(f'Your program called input() more times than expected. The program should have already ended. The output was:\n{stdout}')
