@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="pytest-devlife",
-    version="0.0.2",
+    version="0.0.3",
     author="Andrew Kurauchi",
     author_email="andrewTNK@insper.edu.br",
     description="Pytest plugin for Insper Developer Life",
