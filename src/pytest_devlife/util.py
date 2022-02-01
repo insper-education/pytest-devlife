@@ -1,5 +1,5 @@
 import inspect
-
+from contextlib import contextmanager
 
 def function_exists_in_module(mod, func):
     all_functions = inspect.getmembers(mod, inspect.isfunction)
@@ -18,3 +18,11 @@ def called_once_with(func, args, kwargs={}):
     received_kwargs = func.mock_calls[0].kwargs
     if len(received_kwargs) != 0 or len(kwargs) != 0:
         assert func.mock_calls[0].kwargs == kwargs
+
+
+@contextmanager
+def catch_loop_stop_iteration():
+    try:
+        yield
+    except StopIteration:
+        raise AssertionError('Seu loop rodou mais vezes que o esperado!')
