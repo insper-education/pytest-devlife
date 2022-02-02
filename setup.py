@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="pytest-devlife",
-    version="0.0.3",
+    version="0.1",
     author="Andrew Kurauchi",
     author_email="andrewTNK@insper.edu.br",
     description="Pytest plugin for Insper Developer Life",
@@ -22,7 +22,7 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     entry_points={
         'pytest11': [
             'devlife = pytest_devlife',
