@@ -2,8 +2,8 @@ import builtins
 import io
 import pytest
 import runpy
-import pytest_devlife.pygame_tracer
-
+from unittest import mock
+import functools
 
 inpt = builtins.input
 @pytest.fixture
@@ -29,10 +29,20 @@ def run_program(capsys):
     return runner
 
 
-@pytest.fixture
-def mockgame():
-    import pytest_devlife.pygame_tracer
-    if hasattr(pytest_devlife.pygame_tracer, 'mock'):
-        return pytest_devlife.pygame_tracer.mock
+def mockgame(module_name):
+    def module_name_decorator(func):
+        @functools.wraps(func)
+        @mock.patch(module_name)
+        def effective_mock_pygame_decorator(mpyg):
+            import pygame
 
-    pytest.fail('Pygame is not installed.')
+            # restore constants
+            for att in pygame.__dict__.keys():
+                if att.upper() == att:
+                    setattr(mpyg, att, getattr(pygame, att))
+
+            func(mpyg)
+
+        return effective_mock_pygame_decorator
+
+    return module_name_decorator
