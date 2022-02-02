@@ -1,6 +1,7 @@
 import inspect
 from contextlib import contextmanager
 
+
 def function_exists_in_module(mod, func):
     all_functions = inspect.getmembers(mod, inspect.isfunction)
     assert any([f[0] == func for f in all_functions]), f'A função {func} não foi definida!'
