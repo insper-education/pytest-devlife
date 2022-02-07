@@ -1,0 +1,13 @@
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "*"
+
+name: Update latest tag
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Latest tag
+        uses: EndBug/latest-tag@v1.4.0
