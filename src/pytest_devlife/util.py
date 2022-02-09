@@ -10,15 +10,14 @@ def function_exists_in_module(mod, func):
 def called_once_with(func, args, kwargs={}):
     args = tuple(args)
 
-    n_calls = len(func.mock_calls)
+    n_calls = len(func.call_args_list)
     assert n_calls == 1, f'{func._extract_mock_name()} só deveria ser chamada uma vez, mas foi chamada {n_calls} vezes'
 
-    received_args = func.mock_calls[0].args
+    received_args, received_kwargs = func.call_args_list[0]
     assert received_args == args, f'{func._extract_mock_name()} deveria receber como argumentos {args}, mas recebeu {received_args}'
 
-    received_kwargs = func.mock_calls[0].kwargs
     if len(received_kwargs) != 0 or len(kwargs) != 0:
-        assert func.mock_calls[0].kwargs == kwargs
+        assert received_kwargs == kwargs
 
 
 @contextmanager
