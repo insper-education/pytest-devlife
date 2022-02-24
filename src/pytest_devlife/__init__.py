@@ -20,7 +20,7 @@ class DevLifePyTestPlugin:
 
     def submit_solution(self, exercise):
         title = exercise.meta.get("title")
-        result_count = f'{exercise.outcomes.passed()}/{exercise.total_tests}'
+        result_count = f'{exercise.outcomes.passed()}/{exercise.total_tests()}'
         msg_submitted = f'{title} ({result_count}) {BLUE}[submitted]{ENDC}'
         msg_not_submitted = f'{title} ({result_count}) {BLUE}[not submitted]{ENDC}'
 
@@ -52,7 +52,6 @@ class DevLifePyTestPlugin:
             exercise = self.get_or_create_exercise_result(item)
             if not exercise:
                 continue
-            exercise.inc_tests()
             
 
     @pytest.hookimpl(tryfirst=True, hookwrapper=True)

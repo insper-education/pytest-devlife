@@ -14,6 +14,9 @@ class Outcomes:
     def passed(self):
         return self.outcomes.get('passed', 0)
 
+    def total(self):
+        return sum(self.outcomes.values())
+
     def increment(self, outcome_name):
         self.outcomes.setdefault(outcome_name, 0)
         self.outcomes[outcome_name] += 1
@@ -22,8 +25,6 @@ class Outcomes:
 class Exercise:
     def __init__(self, item):
         self.exercise_dir = Path(item.fspath).parent
-
-        self.total_tests = 0
         self.outcomes = Outcomes()
 
         self.meta = self._load_meta(self.exercise_dir)
@@ -34,7 +35,7 @@ class Exercise:
 
     def to_data(self):
         passed = self.outcomes.passed()
-        total = self.total_tests
+        total = self.total_tests()
         return {
             'slug': self.slug,
             'points': passed / total,
@@ -42,8 +43,9 @@ class Exercise:
             'student_input': self.code,
         }
 
-    def inc_tests(self):
-        self.total_tests += 1
+    def total_tests(self):
+        # Skipped tests are not included in the outcomes
+        return self.outcomes.total()
 
     def has_syntax_errors(self):
         return not self.syntax_ok
