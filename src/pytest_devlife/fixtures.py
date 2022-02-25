@@ -12,7 +12,10 @@ def mock_input(monkeypatch):
         return inpt()
 
     def setup_mock(strings):
-        monkeypatch.setattr('sys.stdin', io.StringIO('\n'.join(strings)))
+        mocked_stdin =  io.StringIO('\n'.join(strings))
+        monkeypatch.setattr('sys.stdin', mocked_stdin)
+
+        return mocked_stdin
 
     monkeypatch.setattr('builtins.input', mocked)
     return setup_mock
