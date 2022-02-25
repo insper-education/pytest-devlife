@@ -2,6 +2,9 @@ import ast
 import traceback
 from pathlib import Path
 import yaml
+import mimetypes
+import glob
+import os.path as osp
 
 
 class Outcomes:
@@ -18,15 +21,16 @@ class Outcomes:
 
 class Exercise:
     def __init__(self, item):
-        exercise_dir = Path(item.fspath).parent
+        self.exercise_dir = Path(item.fspath).parent
+
         self.total_tests = 0
         self.outcomes = Outcomes()
 
-        self.meta = self._load_meta(exercise_dir)
-        self.code = self._load_code()
+        self.meta = self._load_meta(self.exercise_dir)
+        self.code = self._load_student_submission()
 
         self._check_meta()
-        self._check_code()
+        #self._check_code()
 
     def to_data(self):
         passed = self.outcomes.passed()
@@ -35,7 +39,7 @@ class Exercise:
             'slug': self.slug,
             'points': passed / total,
             'test_results': {'passed': f'{passed}/{total}'},
-            'student_input': {'code': self.code},
+            'student_input': self.code,
         }
 
     def inc_tests(self):
@@ -85,11 +89,18 @@ class Exercise:
                 curr_dir = curr_dir.parent
         raise RuntimeError('Could not find meta.yml in exercise folder')
 
-    def _load_code(self):
-        try:
-            student_file = self.meta['studentFile']
-        except KeyError:
-            raise RuntimeError('Could not find studentFile in meta.yml')
-        self.code_file = self.meta_file.parent / student_file
-        with open(self.code_file) as f:
-            return f.read()
+    def _load_student_submission(self):
+        files_to_send = {}
+        for file in  glob.glob(str(self.exercise_dir) + '/**', recursive=True):
+            # Exclusion rules
+            if osp.isdir(file): continue # not a directory
+            if Path(file).name.startswith('test_'): continue # not a test file
+            if file.endswith('.md'): continue # not a markdown file
+
+            mtype, _ = mimetypes.guess_type(file)
+            if mtype and mtype.startswith('text/'):
+                with open(file) as f:
+                    key = Path(file).relative_to(self.exercise_dir)
+                    files_to_send[str(key)] = f.read()
+
+        return files_to_send

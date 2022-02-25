@@ -53,9 +53,7 @@ class DevLifePyTestPlugin:
             if not exercise:
                 continue
             exercise.inc_tests()
-            if exercise.has_syntax_errors():
-                exercise.outcomes.increment('errors')
-                item.add_marker(syntax_error_mark)
+            
 
     @pytest.hookimpl(tryfirst=True, hookwrapper=True)
     def pytest_runtest_makereport(self, item):
@@ -71,8 +69,10 @@ class DevLifePyTestPlugin:
     def pytest_sessionfinish(self):
         if not self.settings:
             return
+        
         for exercise in self.exercise_results.values():
-            self.submit_solution(exercise)
+            if len(exercise.outcomes.outcomes) > 0:
+                self.submit_solution(exercise)
 
     def pytest_terminal_summary(self, terminalreporter):
         terminalreporter.ensure_newline()
