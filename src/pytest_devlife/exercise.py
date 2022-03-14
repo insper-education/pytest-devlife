@@ -83,7 +83,7 @@ class Exercise:
         while curr_dir and curr_dir != prev_dir:
             meta_file = curr_dir / 'meta.yml'
             try:
-                with open(meta_file) as f:
+                with open(meta_file, encoding='utf8', errors='replace') as f:
                     self.meta_file = meta_file
                     return yaml.safe_load(f)
             except IOError:
@@ -101,7 +101,7 @@ class Exercise:
 
             mtype, _ = mimetypes.guess_type(file)
             if mtype and mtype.startswith('text/'):
-                with open(file) as f:
+                with open(file, encoding='utf8', errors='replace') as f:
                     key = Path(file).relative_to(self.exercise_dir)
                     files_to_send[str(key)] = f.read()
 
