@@ -28,4 +28,8 @@ setuptools.setup(
             'devlife = pytest_devlife',
         ],
     },
+    install_requires=[
+        'pytest',
+        'python-dotenv',
+    ],
 )
