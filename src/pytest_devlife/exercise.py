@@ -1,10 +1,11 @@
-import ast
-import traceback
-from pathlib import Path
-import yaml
-import mimetypes
 import glob
+import mimetypes
 import os.path as osp
+from pathlib import Path
+
+import yaml
+
+META_FILENAME = 'devlife.yml'
 
 
 class Outcomes:
@@ -30,17 +31,26 @@ class Exercise:
         self.meta = self._load_meta(self.exercise_dir)
         self.code = self._load_student_submission()
 
-        self._check_meta()
-        #self._check_code()
-
     def to_data(self):
         passed = self.outcomes.passed()
         total = self.total_tests()
+
+        points = 0
+        if total > 0:
+            points = passed / total
+
         return {
-            'slug': self.slug,
-            'points': passed / total,
-            'test_results': {'passed': f'{passed}/{total}'},
-            'student_input': self.code,
+            'exercise': {
+                'course': self.course,
+                'slug': self.slug,
+                'tags': self.tags,
+            },
+            'points': points,
+            'log': {
+                'passing_tests': passed,
+                'total_tests': total,
+                'student_input': self.code,
+            },
         }
 
     def total_tests(self):
@@ -52,36 +62,38 @@ class Exercise:
 
     @property
     def slug(self):
-        return self.meta.get('slug')
+        return self.meta.get('slug', '')
 
     @property
-    def offering(self):
-        return self.meta.get('offering')
+    def course(self):
+        return self.meta.get('course')
 
-    def _check_meta(self):
+    @property
+    def tags(self):
+        return self.meta.get('tags', [])
+
+    @property
+    def telemetry_endpoint(self):
+        return self.meta.get('telemetryEndpoint')
+
+    def meta_is_valid(self):
+        if not self.meta:
+            print(f'Could not find {META_FILENAME} file')
+            return False
         if self.slug is None:
-            raise RuntimeError('Could not find slug in meta.yml')
-        if self.offering is None:
-            raise RuntimeError('Could not find offering in meta.yml')
-
-    def _check_code(self):
-        self.syntax_ok = True
-        # We only check the syntax if the student file is a Python file
-        if '.py' not in Path(self.code_file).suffix:
-            return
-        try:
-            compile(self.code, filename=self.code_file, mode='exec', flags=ast.PyCF_ONLY_AST)
-        except SyntaxError:
-            msg = traceback.format_exc()
-            self.error_msg = msg  # TODO DO WE NEED THIS MESSAGE FOR ANYTHING?
-            self.syntax_ok = False
+            print(f'Could not find slug in {META_FILENAME}')
+            return False
+        if self.course is None:
+            print(f'Could not find course in {META_FILENAME}')
+            return False
+        return True
 
     def _load_meta(self, exercise_dir):
         prev_dir = None
         curr_dir = exercise_dir
 
         while curr_dir and curr_dir != prev_dir:
-            meta_file = curr_dir / 'meta.yml'
+            meta_file = curr_dir / META_FILENAME
             try:
                 with open(meta_file, encoding='utf8', errors='replace') as f:
                     self.meta_file = meta_file
@@ -89,7 +101,7 @@ class Exercise:
             except IOError:
                 prev_dir = curr_dir
                 curr_dir = curr_dir.parent
-        raise RuntimeError('Could not find meta.yml in exercise folder')
+        raise {}
 
     def _load_student_submission(self):
         files_to_send = {}
