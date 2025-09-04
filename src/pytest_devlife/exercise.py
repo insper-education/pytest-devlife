@@ -101,7 +101,7 @@ class Exercise:
             except IOError:
                 prev_dir = curr_dir
                 curr_dir = curr_dir.parent
-        raise {}
+        raise Exception
 
     def _load_student_submission(self):
         files_to_send = {}
